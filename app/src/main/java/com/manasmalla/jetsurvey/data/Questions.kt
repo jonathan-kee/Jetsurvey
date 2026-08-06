@@ -4,16 +4,38 @@ import com.manasmalla.jetsurvey.R
 
 val questions = listOf(
     SurveyQuestion(
-        question = "In my free time I like to ...",
+        question = "Relationship: I felt heard, understood, and respected by my therapist today.",
+        options = Options.SliderChoice(sliderOptions = listOf(
+            "Strongly\nDislike", "Neutral", "Strongly\nLike"
+        ))
+    ),
+    SurveyQuestion(
+        question = "Goals & Topics: We worked on and talked about what was important to me today.",
+        options = Options.SliderChoice(sliderOptions = listOf(
+            "Strongly\nDislike", "Neutral", "Strongly\nLike"
+        ))
+    ),
+    SurveyQuestion(
+        question = "Approach & Fit: The therapist's approach and style felt like a good fit for this session.",
+        options = Options.SliderChoice(sliderOptions = listOf(
+            "Strongly\nDislike", "Neutral", "Strongly\nLike"
+        ))
+    ),
+    SurveyQuestion(
+        question = "Overall Value: Overall, today's session was helpful and valuable to me.",
+        options = Options.SliderChoice(sliderOptions = listOf(
+            "Strongly\nDislike", "Neutral", "Strongly\nLike"
+        ))
+    ),
+    SurveyQuestion(
+        question = "Is there anything you'd like to do differently in our next session?",
         description = "Select all that apply.",
         Options.MultipleChoice(
             options = listOf(
-                "Read",
-                "Work out",
-                "Draw",
-                "Play video games",
-                "Dance",
-                "Watch Movies"
+                "More practical tools",
+                "More time to talk",
+                "Change pace",
+                "Keep it the same"
             )
         )
     ),
@@ -31,12 +53,6 @@ val questions = listOf(
         question = "When was the last time you ordered takeaway because you couldn't be bothered to cook?",
         description = "Select date.",
         options = Options.DateChoice
-    ),
-    SurveyQuestion(
-        question = "How do you feel about selfies 🤳?",
-        options = Options.SliderChoice(sliderOptions = listOf(
-            "Strongly\nDislike", "Neutral", "Strongly\nLike"
-        ))
     ),
     SurveyQuestion(question = "Show off your selfie skills!", options = Options.ImageChoice)
 )

@@ -17,11 +17,19 @@ Column(){
     }
 }
 
-# Jetsurvey sample
+# Welcome Screen
 Column(){
     Title()
     SignInSection()
 }
+
+# SurveyScaffold (Read the source code)
+
+# MultipleChoice
+questions.first() is refering to Questions.kt
+
+# View Model is feed 
+look into question
 
 Jetsurvey is a sample survey app, built with
 [Jetpack Compose](https://developer.android.com/jetpack/compose). The goal of the sample is to
