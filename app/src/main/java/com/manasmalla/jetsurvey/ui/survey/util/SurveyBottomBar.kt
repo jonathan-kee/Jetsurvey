@@ -1,6 +1,7 @@
 package com.manasmalla.jetsurvey.ui.survey.util
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -26,8 +27,12 @@ fun SurveyBottomBar(progress: Int, onPreviousPressed: ()->Unit = {}, isNextEnabl
                 .padding(16.dp)
                 .navigationBarsPadding(), horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Larger button padding (e.g., 16.dp top/bottom instead of the default ~8.dp)
+            val buttonPadding = PaddingValues(vertical = 16.dp, horizontal = 24.dp)
+
             if (progress > 1) {
                 OutlinedButton(
+                    contentPadding = buttonPadding,
                     onClick = onPreviousPressed, modifier =
                     Modifier
                         .weight(1f)
@@ -37,6 +42,7 @@ fun SurveyBottomBar(progress: Int, onPreviousPressed: ()->Unit = {}, isNextEnabl
             }
 
             Button(
+                contentPadding = buttonPadding,
                 onClick = onNextPressed, modifier =
                 Modifier
                     .weight(1f), enabled = isNextEnabled
