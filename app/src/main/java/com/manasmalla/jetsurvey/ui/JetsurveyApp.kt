@@ -18,20 +18,25 @@ object Destinations {
 @Composable
 fun JetsurveyApp(navController: NavHostController = rememberNavController()) {
     NavHost(navController = navController, startDestination = Destinations.WELCOME_ROUTE) {
+        // "welcome"
         composable(Destinations.WELCOME_ROUTE) {
             WelcomeScreen(onNavigateToSignIn = {
                 navController.navigate("signin/$it")
             }, onNavigateToSurvey = {
+                // This code goes to SURVEY_ROUTE (survey)
                 navController.navigate(Destinations.SURVEY_ROUTE)
             })
         }
+        // "survey"
         composable(Destinations.SURVEY_ROUTE) {
             SurveyScaffold(onNavigateUp = {
                 navController.navigateUp()
             }, onNavigateToResults = {
+                // This code goes to SURVEY_RESULT_ROUTE (result)
                 navController.navigate(Destinations.SURVEY_RESULT_ROUTE)
             })
         }
+        // "result"
         composable(Destinations.SURVEY_RESULT_ROUTE){
             SurveyResultScreen {
                 navController.popBackStack(Destinations.WELCOME_ROUTE, false)
