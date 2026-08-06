@@ -1,7 +1,5 @@
 package com.manasmalla.jetsurvey.data
 
-import com.manasmalla.jetsurvey.R
-
 val standardOptions = listOf("Strongly\ndisagree", "Neutral", "Strongly\nagree")
 
 val questions = listOf(
@@ -20,6 +18,18 @@ val questions = listOf(
     SurveyQuestion(
         question = "Overall Value: Overall, today's session was helpful and valuable to me.",
         options = Options.CheckboxChoice(checkboxOptions = standardOptions)
+    ),
+    SurveyQuestion(
+        question = "Is there anything you'd like to do differently in our next session?",
+        description = "Select all that apply.",
+        Options.MultipleChoice(
+            options = listOf(
+                "More practical tools",
+                "More time to talk",
+                "Change pace",
+                "Keep it the same"
+            )
+        )
     ),
 //    SurveyQuestion(
 //        question = "Relationship: I felt heard, understood, and respected by my therapist today.",
@@ -45,18 +55,6 @@ val questions = listOf(
 //            "Strongly\nDislike", "Neutral", "Strongly\nLike"
 //        ))
 //    ),
-    SurveyQuestion(
-        question = "Is there anything you'd like to do differently in our next session?",
-        description = "Select all that apply.",
-        Options.MultipleChoice(
-            options = listOf(
-                "More practical tools",
-                "More time to talk",
-                "Change pace",
-                "Keep it the same"
-            )
-        )
-    ),
 //    SurveyQuestion(
 //        question = "Pick a Compose comic character",
 //        description = "Select one.",

@@ -11,7 +11,6 @@ import com.manasmalla.jetsurvey.ui.survey.SurveyScaffold
 
 object Destinations {
     const val WELCOME_ROUTE = "welcome"
-    const val SIGN_IN_ROUTE = "signin/{email}"
     const val SURVEY_ROUTE = "survey"
     const val SURVEY_RESULT_ROUTE = "result"
 }
@@ -22,14 +21,6 @@ fun JetsurveyApp(navController: NavHostController = rememberNavController()) {
         composable(Destinations.WELCOME_ROUTE) {
             WelcomeScreen(onNavigateToSignIn = {
                 navController.navigate("signin/$it")
-            }, onNavigateToSurvey = {
-                navController.navigate(Destinations.SURVEY_ROUTE)
-            })
-        }
-        composable(Destinations.SIGN_IN_ROUTE) {
-            val startingEmail = it.arguments?.getString("email")
-            SignInScreen(startingEmail = startingEmail, onNavigateBack = {
-                navController.navigateUp()
             }, onNavigateToSurvey = {
                 navController.navigate(Destinations.SURVEY_ROUTE)
             })

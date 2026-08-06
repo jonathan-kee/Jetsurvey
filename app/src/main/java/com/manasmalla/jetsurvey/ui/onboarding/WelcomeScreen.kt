@@ -56,47 +56,7 @@ fun Title(modifier: Modifier = Modifier) {
 @Preview
 @Composable
 fun SignInSection(modifier: Modifier = Modifier, onNavigateToSignIn: (String) -> Unit = {}, onNavigateToSurvey: () -> Unit = {}) {
-//    var email by remember {
-//        mutableStateOf("")
-//    }
-//    val isButtonEnabled by remember {
-//        derivedStateOf {
-//            email != ""
-//        }
-//    }
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        // Text(text = "Sign in or create an account", modifier = Modifier.padding(vertical = 16.dp))
-//        OutlinedTextField(
-//            value = email,
-//            onValueChange = {
-//                email = it
-//            },
-//            placeholder = {
-//                Text("Email")
-//            },
-//            modifier = Modifier.fillMaxWidth(),
-//            keyboardActions = KeyboardActions(onDone = {
-//                if (isButtonEnabled) {
-//                    onNavigateToSignIn(email)
-//                }
-//            }),
-//            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-//            singleLine = true,
-//            shape = MaterialTheme.shapes.small
-//        )
-//        Button(
-//            onClick = {
-//                if (isButtonEnabled) {
-//                    onNavigateToSignIn(email)
-//                }
-//            }, modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(vertical = 24.dp), enabled = isButtonEnabled
-//        ) {
-//            Text("Continue")
-//        }
-//        Text(text = "or")
-
         // Larger button padding (e.g., 16.dp top/bottom instead of the default ~8.dp)
         val buttonPadding = PaddingValues(vertical = 16.dp, horizontal = 24.dp)
 
