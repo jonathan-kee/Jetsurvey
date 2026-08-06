@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.compose.AppTheme
 import com.manasmalla.jetsurvey.data.Options
 import com.manasmalla.jetsurvey.data.questions
 import com.manasmalla.jetsurvey.ui.theme.JetsurveyTheme
@@ -74,7 +75,7 @@ fun CheckboxRow(title: String = "Checbox Title", selected: Boolean = false, onOp
 @Preview(showBackground = true)
 @Composable
 fun MultipleOptionListPreview() {
-    JetsurveyTheme {
+    AppTheme {
 
         val selectedItems = remember {
             mutableStateListOf<String>()

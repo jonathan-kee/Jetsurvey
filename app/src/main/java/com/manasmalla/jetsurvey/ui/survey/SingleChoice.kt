@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.compose.AppTheme
 import com.manasmalla.jetsurvey.R
 import com.manasmalla.jetsurvey.data.Options
 import com.manasmalla.jetsurvey.data.questions
@@ -86,7 +87,7 @@ fun RadioRow(
 @Preview(showBackground = true)
 @Composable
 fun SingleOptionListPreview() {
-    JetsurveyTheme {
+    AppTheme {
         Column {
             SingleOptionsSection("Spark", questions[1].options as Options.SingleChoice)
         }

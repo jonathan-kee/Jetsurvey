@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.compose.AppTheme
 import com.manasmalla.jetsurvey.R
 import com.manasmalla.jetsurvey.ui.theme.JetsurveyTheme
 
@@ -104,7 +105,7 @@ fun FileQuestion(modifier: Modifier = Modifier, imageUri: Uri? = null, onImageSe
 @Preview(showBackground = true)
 @Composable
 fun FileQuestionPreview() {
-    JetsurveyTheme {
+    AppTheme {
         FileQuestion()
     }
 }

@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.compose.AppTheme
 import com.manasmalla.jetsurvey.data.Options
 import com.manasmalla.jetsurvey.ui.survey.util.SurveyBottomBar
 import com.manasmalla.jetsurvey.ui.theme.JetsurveyTheme
@@ -182,7 +183,7 @@ fun SurveyScaffold(
 @Preview(showBackground = true)
 @Composable
 fun SurveyScaffoldPreview() {
-    JetsurveyTheme {
+    AppTheme {
         SurveyScaffold()
     }
 }

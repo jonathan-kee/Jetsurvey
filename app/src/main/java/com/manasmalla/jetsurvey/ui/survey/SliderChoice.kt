@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.compose.AppTheme
 import com.manasmalla.jetsurvey.data.Options
 import com.manasmalla.jetsurvey.data.questions
 import com.manasmalla.jetsurvey.ui.theme.JetsurveyTheme
@@ -30,7 +31,7 @@ fun SliderChoice(value: Float = 0.5f, onValueChange: (Float)->Unit = {}, options
 @Preview(showBackground = true)
 @Composable
 fun SliderChoicePreview() {
-    JetsurveyTheme {
+    AppTheme {
         SliderChoice(options = questions[3].options as Options.SliderChoice)
     }
 }

@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.compose.AppTheme
 import com.manasmalla.jetsurvey.ui.theme.JetsurveyTheme
 import com.manasmalla.jetsurvey.ui.theme.slightlyDeemphasizedAlpha
 
@@ -47,7 +48,7 @@ fun DateQuestion(date: String, showDatePicker: () -> Unit = {}) {
 @Preview(name = "Dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun DateQuestionPreview() {
-    JetsurveyTheme {
+    AppTheme {
         DateQuestion("Sat, Mar 11")
     }
 }
