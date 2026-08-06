@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             WindowCompat.setDecorFitsSystemWindows(window, false)
-            AppTheme {
+            AppTheme(dynamicColor = false) {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
