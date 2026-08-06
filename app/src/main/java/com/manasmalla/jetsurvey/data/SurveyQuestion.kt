@@ -12,3 +12,8 @@ sealed class Options{
 data class SurveyQuestion(
     val question: String, val description:String = "", val options: Options
 )
+
+data class SurveySummaryItem(
+    val questionId: String,
+    val selectedOptions: List<String>
+)
