@@ -1,4 +1,27 @@
+# Break it down
+## Welcome Screen's Title
+Column(){
+    Image()
+    Text()
+}
+## Welcome Screen's Sign In Section
+Column(){
+    Text()
+    OutlinedTextField()
+    Button(){
+        Text()
+    }
+    Text()
+    OutlinedButton(){
+        Text()
+    }
+}
+
 # Jetsurvey sample
+Column(){
+    Title()
+    SignInSection()
+}
 
 Jetsurvey is a sample survey app, built with
 [Jetpack Compose](https://developer.android.com/jetpack/compose). The goal of the sample is to
