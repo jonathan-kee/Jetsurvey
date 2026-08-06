@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.compose.AppTheme
 import com.manasmalla.jetsurvey.data.Options
+import com.manasmalla.jetsurvey.data.SurveyQuestion
 import com.manasmalla.jetsurvey.ui.survey.util.SurveyBottomBar
 import com.manasmalla.jetsurvey.ui.theme.JetsurveyTheme
 import com.manasmalla.jetsurvey.ui.theme.slightlyDeemphasizedAlpha
@@ -53,8 +54,8 @@ fun SurveyScaffold(
     onNavigateToResults: ()->Unit = {}
 ) {
     val surveyViewModel: SurveyViewModel = viewModel()
-    val progress = surveyViewModel.progress
-    val question = surveyViewModel.question
+    val progress: Int = surveyViewModel.progress
+    val question: SurveyQuestion = surveyViewModel.question
     Scaffold(topBar = {
         Column {
             Row(
@@ -133,7 +134,7 @@ fun SurveyScaffold(
 
                     }
 
-                    Options.ImageChoice -> {
+                    is Options.ImageChoice -> {
                         FileQuestion(
                             modifier = Modifier.padding(32.dp),
                             imageUri = surveyViewModel.selfie,
