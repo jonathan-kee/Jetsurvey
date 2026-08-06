@@ -1,5 +1,6 @@
 package com.manasmalla.jetsurvey.ui
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,6 +36,8 @@ fun Modifier.supportWideScreen() = this
 fun SurveyResultScreen(
     onDonePressed: () -> Unit,
 ) {
+    // Larger button padding (e.g., 16.dp top/bottom instead of the default ~8.dp)
+    val buttonPadding = PaddingValues(vertical = 16.dp, horizontal = 24.dp)
 
     Surface(modifier = Modifier.supportWideScreen()) {
         Scaffold(
@@ -49,12 +52,13 @@ fun SurveyResultScreen(
             },
             bottomBar = {
                 OutlinedButton(
+                    contentPadding = buttonPadding,
                     onClick = onDonePressed,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp, vertical = 24.dp)
                 ) {
-                    Text(text = stringResource(id = R.string.done))
+                    Text(text = "End Survey")
                 }
             }
         )
