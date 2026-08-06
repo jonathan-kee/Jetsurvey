@@ -102,17 +102,17 @@ fun SurveyScaffold(
                     surveyQuestion.question,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(20.dp)
+                        .padding(40.dp)
                         .clip(MaterialTheme.shapes.small)
                         .background(color = MaterialTheme.colorScheme.inverseOnSurface)
-                        .padding(20.dp),
+                        .padding(40.dp),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = slightlyDeemphasizedAlpha),
                 )
                 if (surveyQuestion.description != "")
                     Text(
                         text = surveyQuestion.description,
-                        modifier = Modifier.padding(start = 20.dp, bottom = 20.dp),
+                        modifier = Modifier.padding(start = 40.dp, bottom = 40.dp),
                         style = MaterialTheme.typography.bodySmall,
 
                         color = MaterialTheme.colorScheme.onSurface
@@ -134,7 +134,7 @@ fun SurveyScaffold(
 
                     Options.ImageChoice -> {
                         FileQuestion(
-                            modifier = Modifier.padding(16.dp),
+                            modifier = Modifier.padding(32.dp),
                             imageUri = surveyViewModel.selfie,
                             onImageSelected = surveyViewModel::onImageSelected)
                     }
@@ -157,7 +157,7 @@ fun SurveyScaffold(
                     is Options.SliderChoice -> {
                         SliderChoice(
                             options = options,
-                            modifier = Modifier.padding(16.dp),
+                            modifier = Modifier.padding(32.dp),
                             value = surveyViewModel.selfieFeeling ?: 0.5f,
                             onValueChange = surveyViewModel::onSelfieFeelingChange)
 
@@ -166,10 +166,11 @@ fun SurveyScaffold(
                     is Options.CheckboxChoice -> {
                         CheckboxChoice(
                             options = options,
-                            modifier = Modifier.padding(16.dp),
+                            modifier = Modifier.padding(32.dp),
                             selectedOptions = surveyViewModel.freeTimeOptions,
                             onOptionToggle = surveyViewModel::updateMultipleOptionsAnswer
                         )
+
                     }
                 }
 
