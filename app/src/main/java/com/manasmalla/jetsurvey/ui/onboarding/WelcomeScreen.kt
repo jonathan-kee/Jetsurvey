@@ -34,7 +34,7 @@ fun Title(modifier: Modifier = Modifier) {
         modifier = modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.drawable.ic_logo_light),
+            painter = painterResource(id = R.drawable.ripple_logo),
             contentDescription = "Early Minds"
         )
         Text(
