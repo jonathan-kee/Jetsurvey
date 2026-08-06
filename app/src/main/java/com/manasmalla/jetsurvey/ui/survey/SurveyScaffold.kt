@@ -31,10 +31,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.compose.AppTheme
 import com.manasmalla.jetsurvey.data.Options
 import com.manasmalla.jetsurvey.data.SurveyQuestion
 import com.manasmalla.jetsurvey.ui.survey.util.SurveyBottomBar
+import com.manasmalla.jetsurvey.ui.survey.util.SurveyDbHelper
 import com.manasmalla.jetsurvey.ui.theme.JetsurveyTheme
 import com.manasmalla.jetsurvey.ui.theme.slightlyDeemphasizedAlpha
 import com.manasmalla.jetsurvey.ui.theme.stronglyDeemphasizedAlpha
@@ -54,7 +57,19 @@ fun SurveyScaffold(
     onNavigateUp: ()->Unit = {},
     onNavigateToResults: ()->Unit = {}
 ) {
-    val surveyViewModel: SurveyViewModel = viewModel()
+    // 1. Get application context
+    val context = LocalContext.current.applicationContext
+
+    // 2. Pass a custom factory to viewModel()
+    val surveyViewModel: SurveyViewModel = viewModel(
+        factory = viewModelFactory {
+            initializer {
+                val dbHelper = SurveyDbHelper(context)
+                SurveyViewModel(dbHelper)
+            }
+        }
+    )
+
     val progress: Int = surveyViewModel.progress
     val question: SurveyQuestion = surveyViewModel.question
     // data package Questions.kt data will be here
@@ -174,14 +189,23 @@ fun SurveyScaffold(
 
                     }
 
+//                    is Options.CheckboxChoice -> {
+//                        CheckboxChoice(
+//                            options = options,
+//                            modifier = Modifier.padding(32.dp),
+//                            selectedOptions = surveyViewModel.freeTimeOptions,
+//                            onOptionToggle = surveyViewModel::updateMultipleOptionsAnswer
+//                        )
+//                    }
+
                     is Options.CheckboxChoice -> {
                         CheckboxChoice(
-                            options = options,
-                            modifier = Modifier.padding(32.dp),
-                            selectedOptions = surveyViewModel.freeTimeOptions,
-                            onOptionToggle = surveyViewModel::updateMultipleOptionsAnswer
+                            selectedOptions = surveyViewModel.selectedOptions,
+                            onOptionToggle = { option ->
+                                surveyViewModel.onOptionToggle(option, questionId= "question_$progress")
+                            },
+                            options = options
                         )
-
                     }
                 }
 

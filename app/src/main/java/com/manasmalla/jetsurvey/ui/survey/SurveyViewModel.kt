@@ -7,17 +7,23 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.manasmalla.jetsurvey.data.Options
+import com.manasmalla.jetsurvey.data.SurveySummaryItem
 import com.manasmalla.jetsurvey.data.questions
+import com.manasmalla.jetsurvey.ui.survey.util.SurveyDbHelper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-class SurveyViewModel : ViewModel() {
+class SurveyViewModel(private val dbHelper: SurveyDbHelper) : ViewModel() {
 
     var progress by mutableStateOf(1)
         private set
@@ -72,6 +78,7 @@ class SurveyViewModel : ViewModel() {
     // ... rest of your ViewModel ...
 
     fun nextQuestion() {
+        _selectedOptions.clear() // Reset checkboxes before moving to next question
         progress += 1
         freeTimeOptions.clear() // Clears all checked options
 
@@ -85,6 +92,7 @@ class SurveyViewModel : ViewModel() {
     }
 
     fun previousQuestion() {
+        _selectedOptions.clear() // Reset checkboxes before moving to previous question
         progress--
     }
 
@@ -107,4 +115,42 @@ class SurveyViewModel : ViewModel() {
         isNextEnabled = checkIfNextEnabled()
     }
 
+    // ---------- Questions log to database ----------
+    // Checkbox code
+    // Composable state
+    private val _selectedOptions = mutableStateListOf<String>()
+    val selectedOptions: List<String> get() = _selectedOptions
+
+    fun onOptionToggle(option: String, questionId: String) {
+        // 1. Single selection logic: Clear all existing choices first
+        if (_selectedOptions.contains(option)) {
+            _selectedOptions.clear()
+        } else {
+            _selectedOptions.clear()
+            _selectedOptions.add(option)
+        }
+
+        // 2. Notify Jetsurvey's state so `isNextEnabled` gets calculated
+        updateMultipleOptionsAnswer(option)
+
+        // 3. Save to SQLite database on background thread
+        viewModelScope.launch(Dispatchers.IO) {
+            dbHelper.saveResponse(questionId, _selectedOptions.toList())
+        }
+    }
+
+    // Holds all query results for the summary screen
+    var summaryResults by mutableStateOf<List<SurveySummaryItem>>(emptyList())
+        private set
+
+    fun loadSummaryResults() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val results = dbHelper.getAllSavedResponses()
+
+            // Post result back to Main thread
+            withContext(Dispatchers.Main) {
+                summaryResults = results
+            }
+        }
+    }
 }
