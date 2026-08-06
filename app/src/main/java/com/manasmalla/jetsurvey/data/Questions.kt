@@ -2,30 +2,24 @@ package com.manasmalla.jetsurvey.data
 
 import com.manasmalla.jetsurvey.R
 
+val standardOptions = listOf("Strongly\ndisagree", "Neutral", "Strongly\nagree")
+
 val questions = listOf(
     SurveyQuestion(
         question = "Relationship: I felt heard, understood, and respected by my therapist today.",
-        options = Options.CheckboxChoice(checkboxOptions = listOf(
-            "Strongly\nDislike", "Neutral", "Strongly\nLike"
-        ))
+        options = Options.CheckboxChoice(checkboxOptions = standardOptions)
     ),
     SurveyQuestion(
         question = "Goals & Topics: We worked on and talked about what was important to me today.",
-        options = Options.CheckboxChoice(checkboxOptions = listOf(
-            "Strongly\nDislike", "Neutral", "Strongly\nLike"
-        ))
+        options = Options.CheckboxChoice(checkboxOptions = standardOptions)
     ),
     SurveyQuestion(
         question = "Approach & Fit: The therapist's approach and style felt like a good fit for this session.",
-        options = Options.CheckboxChoice(checkboxOptions = listOf(
-            "Strongly\nDislike", "Neutral", "Strongly\nLike"
-        ))
+        options = Options.CheckboxChoice(checkboxOptions = standardOptions)
     ),
     SurveyQuestion(
         question = "Overall Value: Overall, today's session was helpful and valuable to me.",
-        options = Options.CheckboxChoice(checkboxOptions = listOf(
-            "Strongly\nDislike", "Neutral", "Strongly\nLike"
-        ))
+        options = Options.CheckboxChoice(checkboxOptions = standardOptions)
     ),
 //    SurveyQuestion(
 //        question = "Relationship: I felt heard, understood, and respected by my therapist today.",
