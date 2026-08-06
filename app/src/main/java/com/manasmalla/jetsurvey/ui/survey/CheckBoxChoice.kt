@@ -33,6 +33,10 @@ fun CheckboxChoice(
         verticalAlignment = Alignment.CenterVertically
     ) {
         options.checkboxOptions.forEach { option ->
+            // "Strongly\ndisagree"
+            // "Neutral"
+            // "Strongly\nagree"
+            print(option)
             val checked = selectedOptions.contains(option)
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -63,6 +67,7 @@ fun CheckboxChoicePreview() {
 
         CheckboxChoice(
             selectedOptions = selectedOptions,
+            // This is give the user the ability to switch options
             onOptionToggle = { option ->
                 if (selectedOptions.contains(option)) {
                     selectedOptions.remove(option)
