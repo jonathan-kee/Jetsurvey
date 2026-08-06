@@ -131,7 +131,7 @@ fun SurveyScaffold(
                 // Here is checking the Questions.kt data options
                 // This is like a sealed class check
                 when (val options:Options = surveyQuestion.options) {
-                    Options.DateChoice -> {
+                    is Options.DateChoice -> {
 
                         val fragmentManager =
                             LocalContext.current.findActivity().supportFragmentManager
