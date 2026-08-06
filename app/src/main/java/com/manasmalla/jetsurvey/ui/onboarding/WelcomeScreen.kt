@@ -2,9 +2,12 @@ package com.manasmalla.jetsurvey.ui.onboarding
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -21,7 +24,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -35,12 +40,14 @@ fun Title(modifier: Modifier = Modifier) {
     ) {
         Image(
             painter = painterResource(id = R.drawable.ripple_logo),
-            contentDescription = "Early Minds"
+            contentDescription = "Early Minds",
+            modifier = Modifier.clip(CircleShape)
         )
         Text(
-            text = "Find the right support",
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(vertical = 16.dp)
+            text = "After Session Survey",
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(vertical = 32.dp)
         )
     }
 }
@@ -89,7 +96,12 @@ fun SignInSection(modifier: Modifier = Modifier, onNavigateToSignIn: (String) ->
 //            Text("Continue")
 //        }
 //        Text(text = "or")
+
+        // Larger button padding (e.g., 16.dp top/bottom instead of the default ~8.dp)
+        val buttonPadding = PaddingValues(vertical = 16.dp, horizontal = 24.dp)
+
         OutlinedButton(
+            contentPadding = buttonPadding,
             onClick = onNavigateToSurvey, modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 24.dp)
