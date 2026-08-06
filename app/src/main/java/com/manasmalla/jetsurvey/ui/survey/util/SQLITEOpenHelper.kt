@@ -1,5 +1,6 @@
 package com.manasmalla.jetsurvey.ui.survey.util
 
+import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
@@ -33,18 +34,45 @@ class SurveyDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     // Plain SQL execute query
     fun saveResponse(questionId: String, selectedOptions: List<String>) {
         val db = writableDatabase
-        val optionsJoined = selectedOptions.joinToString(",")
 
-        // Plain SQL Upsert query using parameterized bindings (?)
-        val sql = """
-            INSERT INTO survey_responses (question_id, selected_options) 
-            VALUES (?, ?) 
-            ON CONFLICT(question_id) DO UPDATE SET selected_options = excluded.selected_options;
-        """.trimIndent()
+        val values = ContentValues().apply {
+            put("question_id", questionId)
+            // Convert list to comma-separated String (e.g., "Option A,Option B")
+            put("selected_options", selectedOptions.joinToString(","))
+        }
 
-        db.execSQL(sql, arrayOf(questionId, optionsJoined))
+        // CONFLICT_REPLACE overwrites existing rows instead of crashing/failing
+        db.insertWithOnConflict(
+            "survey_responses",
+            null,
+            values,
+            SQLiteDatabase.CONFLICT_REPLACE
+        )
     }
 
+    // -------------------------------------------------------------------
+    // 👉 ADDED: Fetch response for a single question (used during navigation)
+    // -------------------------------------------------------------------
+    fun getSavedResponse(questionId: String): List<String> {
+        val db = readableDatabase
+        val sql = "SELECT selected_options FROM survey_responses WHERE question_id = ?"
+        val cursor = db.rawQuery(sql, arrayOf(questionId))
+
+        var savedOptions = emptyList<String>()
+
+        cursor.use {
+            if (it.moveToFirst()) {
+                val rawOptions = it.getString(it.getColumnIndexOrThrow("selected_options"))
+                if (!rawOptions.isNullOrBlank()) {
+                    savedOptions = rawOptions.split(",")
+                }
+            }
+        }
+
+        return savedOptions
+    }
+
+    // Used for the Summary Screen
     fun getAllSavedResponses(): List<SurveySummaryItem> {
         val db = readableDatabase
         // Plain SQL SELECT query to fetch all rows

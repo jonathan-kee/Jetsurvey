@@ -2,7 +2,7 @@ package com.manasmalla.jetsurvey.ui.survey
 
 import android.net.Uri
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.fragment.app.FragmentManager
@@ -32,22 +32,28 @@ class SurveyViewModel(private val dbHelper: SurveyDbHelper) : ViewModel() {
     var isNextEnabled by mutableStateOf(false)
         private set
 
-    val freeTimeOptions = mutableStateListOf<String>()
+    // Input states for other question types
     var composeCharacter by mutableStateOf("")
     var selfieFeeling by mutableStateOf<Float?>(null)
     var selfie: Uri? by mutableStateOf(null)
     private var date: Long? by mutableStateOf(null)
+
     val formattedDate: String
         get() = SimpleDateFormat(
             "EEE, MMM dd",
             Locale.getDefault()
         ).format(Date(date ?: Calendar.getInstance().time.time))
 
+    // Map holding selected options FOR EACH question ID
+    val multipleChoiceAnswers = mutableStateMapOf<String, List<String>>()
+
     fun showDatePicker(fragmentManager: FragmentManager) {
-        val picker =
-            MaterialDatePicker.Builder.datePicker().setCalendarConstraints(
+        val picker = MaterialDatePicker.Builder.datePicker()
+            .setCalendarConstraints(
                 CalendarConstraints.Builder().setValidator(DateValidatorPointBackward.now()).build()
-            ).setSelection(date).build()
+            )
+            .setSelection(date)
+            .build()
         picker.show(fragmentManager, picker.toString())
         picker.addOnPositiveButtonClickListener {
             date = it
@@ -55,49 +61,41 @@ class SurveyViewModel(private val dbHelper: SurveyDbHelper) : ViewModel() {
         }
     }
 
-    // ... rest of your ViewModel ...
     private fun checkIfNextEnabled(): Boolean {
+        val currentQuestionId = "question_$progress"
         return when (question.options) {
             Options.DateChoice -> date != null
             Options.ImageChoice -> selfie != null
-            is Options.MultipleChoice -> freeTimeOptions.isNotEmpty()
+            is Options.MultipleChoice -> !multipleChoiceAnswers[currentQuestionId].isNullOrEmpty()
             is Options.SingleChoice -> composeCharacter.isNotEmpty()
             is Options.SliderChoice -> selfieFeeling != null
-            is Options.CheckboxChoice -> freeTimeOptions.isNotEmpty()
+            is Options.CheckboxChoice -> !multipleChoiceAnswers[currentQuestionId].isNullOrEmpty()
         }
     }
-
-    fun updateMultipleOptionsAnswer(option: String) {
-        if (freeTimeOptions.contains(option)) {
-            freeTimeOptions.remove(option)
-        } else {
-            freeTimeOptions.add(option)
-        }
-        isNextEnabled = checkIfNextEnabled()
-    }
-    // ... rest of your ViewModel ...
 
     fun nextQuestion() {
-        _selectedOptions.clear() // Reset checkboxes before moving to next question
-        progress += 1
-        freeTimeOptions.clear() // Clears all checked options
+        if (progress < questions.size) {
+            progress += 1
+            val currentQuestionId = "question_$progress"
 
-        // (Optional) Reset other inputs if moving to a fresh question:
-        composeCharacter = ""
-        selfieFeeling = null
-        selfie = null
-        date = null
+            // Reset options for the new question page so checkboxes render unchecked
+            multipleChoiceAnswers[currentQuestionId] = emptyList()
 
-        isNextEnabled = checkIfNextEnabled() // Re-evaluates for the new question
+            // Reset other input fields
+            composeCharacter = ""
+            selfieFeeling = null
+            selfie = null
+            date = null
+
+            isNextEnabled = checkIfNextEnabled()
+        }
     }
 
     fun previousQuestion() {
-        _selectedOptions.clear() // Reset checkboxes before moving to previous question
-        progress--
-    }
-
-    fun updateMultipleOptionsAnswer() {
-        isNextEnabled = checkIfNextEnabled()
+        if (progress > 1) {
+            progress--
+            loadSavedOptionsForQuestion("question_$progress")
+        }
     }
 
     fun updateComposeCharacter(character: String) {
@@ -115,39 +113,54 @@ class SurveyViewModel(private val dbHelper: SurveyDbHelper) : ViewModel() {
         isNextEnabled = checkIfNextEnabled()
     }
 
-    // ---------- Questions log to database ----------
-    // Checkbox code
-    // Composable state
-    private val _selectedOptions = mutableStateListOf<String>()
-    val selectedOptions: List<String> get() = _selectedOptions
+    fun getSelectedOptionsForQuestion(questionId: String): List<String> {
+        return multipleChoiceAnswers[questionId] ?: emptyList()
+    }
 
-    fun onOptionToggle(option: String, questionId: String) {
-        // 1. Single selection logic: Clear all existing choices first
-        if (_selectedOptions.contains(option)) {
-            _selectedOptions.clear()
+    // 1-parameter overload for simple UI calls
+    fun updateMultipleOptionsAnswer(option: String) {
+        updateMultipleOptionsAnswer(optionString = option, questionId = "question_$progress")
+    }
+
+    // Main 2-parameter function to toggle choices and instantly trigger UI recomposition
+    fun updateMultipleOptionsAnswer(optionString: String, questionId: String) {
+        val currentList = multipleChoiceAnswers[questionId].orEmpty().toMutableList()
+
+        if (currentList.contains(optionString)) {
+            currentList.remove(optionString)
         } else {
-            _selectedOptions.clear()
-            _selectedOptions.add(option)
+            currentList.add(optionString)
         }
 
-        // 2. Notify Jetsurvey's state so `isNextEnabled` gets calculated
-        updateMultipleOptionsAnswer(option)
+        // Reassigning the list forces Compose state to update on the very first click
+        multipleChoiceAnswers[questionId] = currentList
 
-        // 3. Save to SQLite database on background thread
+        // Immediately update button visibility state
+        isNextEnabled = checkIfNextEnabled()
+
+        // Save to SQLite on background thread
         viewModelScope.launch(Dispatchers.IO) {
-            dbHelper.saveResponse(questionId, _selectedOptions.toList())
+            dbHelper.saveResponse(questionId, currentList)
         }
     }
 
-    // Holds all query results for the summary screen
+    fun loadSavedOptionsForQuestion(questionId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val savedList = dbHelper.getSavedResponse(questionId)
+            withContext(Dispatchers.Main) {
+                multipleChoiceAnswers[questionId] = savedList
+                isNextEnabled = checkIfNextEnabled()
+            }
+        }
+    }
+
+    // Summary Screen Support
     var summaryResults by mutableStateOf<List<SurveySummaryItem>>(emptyList())
         private set
 
     fun loadSummaryResults() {
         viewModelScope.launch(Dispatchers.IO) {
             val results = dbHelper.getAllSavedResponses()
-
-            // Post result back to Main thread
             withContext(Dispatchers.Main) {
                 summaryResults = results
             }

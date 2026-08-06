@@ -22,19 +22,17 @@ import androidx.compose.ui.unit.dp
 import com.example.compose.AppTheme
 import com.manasmalla.jetsurvey.data.Options
 import com.manasmalla.jetsurvey.data.questions
-import com.manasmalla.jetsurvey.ui.theme.JetsurveyTheme
 
 @Composable
 fun MultipleOptionsSection(
     options: Options.MultipleChoice,
     selectedOptions: MutableList<String>,
-    onOptionSelected: () -> Unit = {}
+    onOptionSelected: (String) -> Unit = {}
 ) {
     options.options.forEach { option ->
         key(option) {
             CheckboxRow(title = option, selected = selectedOptions.contains(option), onOptionSelected = {
-                if(selectedOptions.contains(option)) selectedOptions.remove(option) else selectedOptions.add(option)
-                onOptionSelected()
+                onOptionSelected(option)
             })
         }
     }

@@ -38,10 +38,8 @@ import com.manasmalla.jetsurvey.data.Options
 import com.manasmalla.jetsurvey.data.SurveyQuestion
 import com.manasmalla.jetsurvey.ui.survey.util.SurveyBottomBar
 import com.manasmalla.jetsurvey.ui.survey.util.SurveyDbHelper
-import com.manasmalla.jetsurvey.ui.theme.JetsurveyTheme
 import com.manasmalla.jetsurvey.ui.theme.slightlyDeemphasizedAlpha
 import com.manasmalla.jetsurvey.ui.theme.stronglyDeemphasizedAlpha
-import kotlin.math.log
 
 private tailrec fun Context.findActivity(): AppCompatActivity =
     when (this) {
@@ -63,7 +61,7 @@ fun SurveyScaffold(
     // 2. Pass a custom factory to viewModel()
     val surveyViewModel: SurveyViewModel = viewModel(
         factory = viewModelFactory {
-            initializer {
+            initializer<SurveyViewModel> {
                 val dbHelper = SurveyDbHelper(context)
                 SurveyViewModel(dbHelper)
             }
@@ -165,13 +163,20 @@ fun SurveyScaffold(
                     }
 
                     is Options.MultipleChoice -> {
+                        val currentQuestionId = "question_$progress"
                         MultipleOptionsSection(
-                            // passing listOf("Strongly\ndisagree", "Neutral", "Strongly\nagree")
                             options = options,
-                            selectedOptions = surveyViewModel.freeTimeOptions,
-                            onOptionSelected = surveyViewModel::updateMultipleOptionsAnswer
+                            // Convert the read-only list to a mutable list to satisfy the function parameter type
+                            selectedOptions = surveyViewModel.getSelectedOptionsForQuestion(currentQuestionId).toMutableList(),
+                            onOptionSelected = { option ->
+                                surveyViewModel.updateMultipleOptionsAnswer(
+                                    option,
+                                    currentQuestionId
+                                )
+                            }
                         )
                     }
+
 
                     is Options.SingleChoice -> {
                         SingleOptionsSection(
@@ -200,9 +205,9 @@ fun SurveyScaffold(
 
                     is Options.CheckboxChoice -> {
                         CheckboxChoice(
-                            selectedOptions = surveyViewModel.selectedOptions,
+                            selectedOptions = surveyViewModel.getSelectedOptionsForQuestion("question_$progress"),
                             onOptionToggle = { option ->
-                                surveyViewModel.onOptionToggle(option, questionId= "question_$progress")
+                                surveyViewModel.updateMultipleOptionsAnswer(option, questionId = "question_$progress")
                             },
                             options = options
                         )
