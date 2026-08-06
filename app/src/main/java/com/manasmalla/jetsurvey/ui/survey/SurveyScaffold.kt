@@ -38,6 +38,7 @@ import com.manasmalla.jetsurvey.ui.survey.util.SurveyBottomBar
 import com.manasmalla.jetsurvey.ui.theme.JetsurveyTheme
 import com.manasmalla.jetsurvey.ui.theme.slightlyDeemphasizedAlpha
 import com.manasmalla.jetsurvey.ui.theme.stronglyDeemphasizedAlpha
+import kotlin.math.log
 
 private tailrec fun Context.findActivity(): AppCompatActivity =
     when (this) {
@@ -56,6 +57,10 @@ fun SurveyScaffold(
     val surveyViewModel: SurveyViewModel = viewModel()
     val progress: Int = surveyViewModel.progress
     val question: SurveyQuestion = surveyViewModel.question
+    // data package Questions.kt data will be here
+    print(question)
+
+    // ------------ Decoration ------------
     Scaffold(topBar = {
         Column {
             Row(
@@ -93,6 +98,8 @@ fun SurveyScaffold(
 
         )
     }, modifier = modifier.statusBarsPadding()) {
+        // ------------ Decoration ------------
+
         AnimatedContent(targetState = question) { surveyQuestion ->
             Column(
                 modifier = Modifier
@@ -121,7 +128,9 @@ fun SurveyScaffold(
                             .copy(alpha = stronglyDeemphasizedAlpha),
                     )
 
-                when (val options = surveyQuestion.options) {
+                // Here is checking the Questions.kt data options
+                // This is like a sealed class check
+                when (val options:Options = surveyQuestion.options) {
                     Options.DateChoice -> {
 
                         val fragmentManager =
@@ -131,7 +140,6 @@ fun SurveyScaffold(
                                 surveyViewModel.showDatePicker(fragmentManager = fragmentManager)
                             }
                         )
-
                     }
 
                     is Options.ImageChoice -> {
@@ -143,6 +151,7 @@ fun SurveyScaffold(
 
                     is Options.MultipleChoice -> {
                         MultipleOptionsSection(
+                            // passing listOf("Strongly\ndisagree", "Neutral", "Strongly\nagree")
                             options = options,
                             selectedOptions = surveyViewModel.freeTimeOptions,
                             onOptionSelected = surveyViewModel::updateMultipleOptionsAnswer
