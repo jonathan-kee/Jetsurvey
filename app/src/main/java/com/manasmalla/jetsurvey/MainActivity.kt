@@ -8,6 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
+import com.example.compose.AppTheme
 import com.manasmalla.jetsurvey.ui.JetsurveyApp
 import com.manasmalla.jetsurvey.ui.theme.JetsurveyTheme
 
@@ -16,7 +17,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             WindowCompat.setDecorFitsSystemWindows(window, false)
-            JetsurveyTheme {
+            AppTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
