@@ -32,6 +32,7 @@ fun CheckboxChoice(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // Will loop through the list and create 3 text box
         options.checkboxOptions.forEach { option ->
             // "Strongly\ndisagree"
             // "Neutral"
