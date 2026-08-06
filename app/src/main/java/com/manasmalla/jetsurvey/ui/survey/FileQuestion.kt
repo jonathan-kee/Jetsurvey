@@ -34,7 +34,6 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.compose.AppTheme
 import com.manasmalla.jetsurvey.R
-import com.manasmalla.jetsurvey.ui.theme.JetsurveyTheme
 
 @Composable
 fun FileQuestion(modifier: Modifier = Modifier, imageUri: Uri? = null, onImageSelected: (Uri)->Unit = {}) {

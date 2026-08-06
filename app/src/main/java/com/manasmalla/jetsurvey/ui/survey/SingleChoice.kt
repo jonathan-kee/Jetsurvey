@@ -25,7 +25,6 @@ import com.example.compose.AppTheme
 import com.manasmalla.jetsurvey.R
 import com.manasmalla.jetsurvey.data.Options
 import com.manasmalla.jetsurvey.data.questions
-import com.manasmalla.jetsurvey.ui.theme.JetsurveyTheme
 
 @Composable
 fun SingleOptionsSection(

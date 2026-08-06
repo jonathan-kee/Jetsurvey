@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import com.example.compose.AppTheme
 import com.manasmalla.jetsurvey.R
 import com.manasmalla.jetsurvey.ui.survey.util.ErrorSnackbar
-import com.manasmalla.jetsurvey.ui.theme.JetsurveyTheme
 import kotlinx.coroutines.launch
 
 

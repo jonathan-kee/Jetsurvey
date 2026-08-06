@@ -14,7 +14,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.compose.AppTheme
 import com.manasmalla.jetsurvey.data.Options
 import com.manasmalla.jetsurvey.data.questions
-import com.manasmalla.jetsurvey.ui.theme.JetsurveyTheme
 
 @Composable
 fun SliderChoice(value: Float = 0.5f, onValueChange: (Float)->Unit = {}, options: Options.SliderChoice, modifier: Modifier = Modifier) {

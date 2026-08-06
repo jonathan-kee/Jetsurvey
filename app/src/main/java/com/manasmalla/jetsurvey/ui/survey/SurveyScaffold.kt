@@ -38,8 +38,8 @@ import com.manasmalla.jetsurvey.data.Options
 import com.manasmalla.jetsurvey.data.SurveyQuestion
 import com.manasmalla.jetsurvey.ui.survey.util.SurveyBottomBar
 import com.manasmalla.jetsurvey.ui.survey.util.SurveyDbHelper
-import com.manasmalla.jetsurvey.ui.theme.slightlyDeemphasizedAlpha
-import com.manasmalla.jetsurvey.ui.theme.stronglyDeemphasizedAlpha
+import com.manasmalla.jetsurvey.ui.oldtheme.slightlyDeemphasizedAlpha
+import com.manasmalla.jetsurvey.ui.oldtheme.stronglyDeemphasizedAlpha
 
 private tailrec fun Context.findActivity(): AppCompatActivity =
     when (this) {
