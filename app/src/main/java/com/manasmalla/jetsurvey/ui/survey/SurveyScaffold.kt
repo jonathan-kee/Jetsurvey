@@ -162,6 +162,15 @@ fun SurveyScaffold(
                             onValueChange = surveyViewModel::onSelfieFeelingChange)
 
                     }
+
+                    is Options.CheckboxChoice -> {
+                        CheckboxChoice(
+                            options = options,
+                            modifier = Modifier.padding(16.dp),
+                            selectedOptions = surveyViewModel.freeTimeOptions,
+                            onOptionToggle = surveyViewModel::updateMultipleOptionsAnswer
+                        )
+                    }
                 }
 
             }

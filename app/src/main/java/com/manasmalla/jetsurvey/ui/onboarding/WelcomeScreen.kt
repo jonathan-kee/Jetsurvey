@@ -94,7 +94,7 @@ fun SignInSection(modifier: Modifier = Modifier, onNavigateToSignIn: (String) ->
                 .fillMaxWidth()
                 .padding(vertical = 24.dp)
         ) {
-            Text("Sign in as a guest")
+            Text("Begin survey")
         }
     }
 }

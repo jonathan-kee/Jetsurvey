@@ -49,19 +49,39 @@ class SurveyViewModel : ViewModel() {
         }
     }
 
+    // ... rest of your ViewModel ...
     private fun checkIfNextEnabled(): Boolean {
         return when (question.options) {
             Options.DateChoice -> date != null
             Options.ImageChoice -> selfie != null
             is Options.MultipleChoice -> freeTimeOptions.isNotEmpty()
-            is Options.SingleChoice -> composeCharacter != ""
+            is Options.SingleChoice -> composeCharacter.isNotEmpty()
             is Options.SliderChoice -> selfieFeeling != null
+            is Options.CheckboxChoice -> freeTimeOptions.isNotEmpty()
         }
     }
 
+    fun updateMultipleOptionsAnswer(option: String) {
+        if (freeTimeOptions.contains(option)) {
+            freeTimeOptions.remove(option)
+        } else {
+            freeTimeOptions.add(option)
+        }
+        isNextEnabled = checkIfNextEnabled()
+    }
+    // ... rest of your ViewModel ...
+
     fun nextQuestion() {
         progress += 1
-        isNextEnabled = checkIfNextEnabled()
+        freeTimeOptions.clear() // Clears all checked options
+
+        // (Optional) Reset other inputs if moving to a fresh question:
+        composeCharacter = ""
+        selfieFeeling = null
+        selfie = null
+        date = null
+
+        isNextEnabled = checkIfNextEnabled() // Re-evaluates for the new question
     }
 
     fun previousQuestion() {

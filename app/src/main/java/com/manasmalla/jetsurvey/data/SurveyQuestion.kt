@@ -1,6 +1,7 @@
 package com.manasmalla.jetsurvey.data
 
 sealed class Options{
+    data class CheckboxChoice(val checkboxOptions: List<String>): Options()
     data class MultipleChoice(val options: List<String>): Options()
     data class SingleChoice(val options: Map<String, Int>): Options()
     object DateChoice: Options()

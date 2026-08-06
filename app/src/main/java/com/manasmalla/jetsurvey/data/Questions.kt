@@ -5,6 +5,30 @@ import com.manasmalla.jetsurvey.R
 val questions = listOf(
     SurveyQuestion(
         question = "Relationship: I felt heard, understood, and respected by my therapist today.",
+        options = Options.CheckboxChoice(checkboxOptions = listOf(
+            "Strongly\nDislike", "Neutral", "Strongly\nLike"
+        ))
+    ),
+    SurveyQuestion(
+        question = "Goals & Topics: We worked on and talked about what was important to me today.",
+        options = Options.CheckboxChoice(checkboxOptions = listOf(
+            "Strongly\nDislike", "Neutral", "Strongly\nLike"
+        ))
+    ),
+    SurveyQuestion(
+        question = "Approach & Fit: The therapist's approach and style felt like a good fit for this session.",
+        options = Options.CheckboxChoice(checkboxOptions = listOf(
+            "Strongly\nDislike", "Neutral", "Strongly\nLike"
+        ))
+    ),
+    SurveyQuestion(
+        question = "Overall Value: Overall, today's session was helpful and valuable to me.",
+        options = Options.CheckboxChoice(checkboxOptions = listOf(
+            "Strongly\nDislike", "Neutral", "Strongly\nLike"
+        ))
+    ),
+    SurveyQuestion(
+        question = "Relationship: I felt heard, understood, and respected by my therapist today.",
         options = Options.SliderChoice(sliderOptions = listOf(
             "Strongly\nDislike", "Neutral", "Strongly\nLike"
         ))
