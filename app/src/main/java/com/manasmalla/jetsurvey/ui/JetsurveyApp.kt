@@ -95,8 +95,7 @@ fun JetsurveyApp(navController: NavHostController = rememberNavController()) {
             SurveySummaryScreen(
                 viewModel = summaryViewModel,
                 onDone = {
-                    // Pop all survey screens and return to Welcome screen
-                    navController.popBackStack(Destinations.WELCOME_ROUTE, inclusive = false)
+                    navController.navigateUp()
                 }
             )
         }
