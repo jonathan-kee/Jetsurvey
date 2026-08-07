@@ -29,7 +29,7 @@ fun SurveySummaryScreen(
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                Text("Done")
+                Text("Back")
             }
         }
     ) { paddingValues ->
