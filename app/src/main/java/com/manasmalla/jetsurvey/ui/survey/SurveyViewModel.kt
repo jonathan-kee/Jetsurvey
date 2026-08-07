@@ -25,6 +25,7 @@ import java.util.Locale
 
 class SurveyViewModel(private val dbHelper: SurveyDbHelper) : ViewModel() {
 
+    // This is question number
     var progress by mutableStateOf(1)
         private set
     val question get() = questions[progress - 1]
@@ -122,17 +123,42 @@ class SurveyViewModel(private val dbHelper: SurveyDbHelper) : ViewModel() {
         updateMultipleOptionsAnswer(optionString = option, questionId = "question_$progress")
     }
 
-    // Main 2-parameter function to toggle choices and instantly trigger UI recomposition
+    // Main 2-parameter function to handle single vs multiple choices based on question type
     fun updateMultipleOptionsAnswer(optionString: String, questionId: String) {
+        val questionIndex = questionId.removePrefix("question_").toIntOrNull()?.minus(1) ?: (progress - 1)
+        val targetQuestion = questions.getOrNull(questionIndex) ?: question
+
         val currentList = multipleChoiceAnswers[questionId].orEmpty().toMutableList()
 
-        if (currentList.contains(optionString)) {
-            currentList.remove(optionString)
-        } else {
-            currentList.add(optionString)
+        when (targetQuestion.options) {
+            is Options.CheckboxChoice -> {
+                // Single-selection behavior: Only one checkbox can be checked at a time
+                if (currentList.contains(optionString)) {
+                    currentList.clear() // Allows deselecting if clicked again
+                } else {
+                    currentList.clear()
+                    currentList.add(optionString)
+                }
+            }
+            is Options.MultipleChoice -> {
+                // Multi-selection behavior: Multiple checkboxes can be checked
+                if (currentList.contains(optionString)) {
+                    currentList.remove(optionString)
+                } else {
+                    currentList.add(optionString)
+                }
+            }
+            else -> {
+                // Fallback toggle behavior
+                if (currentList.contains(optionString)) {
+                    currentList.remove(optionString)
+                } else {
+                    currentList.add(optionString)
+                }
+            }
         }
 
-        // Reassigning the list forces Compose state to update on the very first click
+        // Reassigning the list forces Compose state to update
         multipleChoiceAnswers[questionId] = currentList
 
         // Immediately update button visibility state
