@@ -51,14 +51,32 @@ fun JetsurveyApp(navController: NavHostController = rememberNavController()) {
             )
         }
 
-        composable(Destinations.SURVEY_RESULT_ROUTE){
-            SurveyResultScreen (
-                onDonePressed = { navController.popBackStack(Destinations.WELCOME_ROUTE, false)},
-                onSummaryPressed = { navController.navigate(Destinations.SUMMARY_RESULT_ROUTE)}
+        // "result"
+        composable(Destinations.SURVEY_RESULT_ROUTE) {
+            val context = LocalContext.current.applicationContext
+            val viewModel: SurveyViewModel = viewModel(
+                factory = viewModelFactory {
+                    initializer {
+                        val dbHelper = SurveyDbHelper(context)
+                        SurveyViewModel(dbHelper)
+                    }
+                }
+            )
+
+            SurveyResultScreen(
+                onDonePressed = {
+                    val webAppUrl = "https://script.google.com/macros/s/AKfycbzYK9Xuv79i6iacMkosrjkoqSygimkPIgmxQOGd7UR-74nz6VOYF7nePKa66n3sYl1QlA/exec"
+                    viewModel.syncAndFinishSurvey(webAppUrl) {
+                        navController.popBackStack(Destinations.WELCOME_ROUTE, false)
+                    }
+                },
+                onSummaryPressed = {
+                    navController.navigate(Destinations.SUMMARY_RESULT_ROUTE)
+                }
             )
         }
 
-        // "result"
+        // "summary"
         composable(Destinations.SUMMARY_RESULT_ROUTE) {
             // 1. Get Application Context
             val context = LocalContext.current.applicationContext

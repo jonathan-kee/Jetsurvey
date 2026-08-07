@@ -6,6 +6,13 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.manasmalla.jetsurvey.data.SurveySummaryItem
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.json.JSONArray
+import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
+
 class SurveyDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {
@@ -96,5 +103,40 @@ class SurveyDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         }
 
         return summaryList
+    }
+
+    // Inside SurveyDbHelper class:
+    suspend fun syncToGoogleSheets(webAppUrl: String): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                val allResponses = getAllSavedResponses()
+                val jsonArray = JSONArray()
+
+                for (item in allResponses) {
+                    val jsonObject = JSONObject().apply {
+                        put("questionId", item.questionId)
+                        put("selectedOptions", item.selectedOptions.joinToString(","))
+                    }
+                    jsonArray.put(jsonObject)
+                }
+
+                val url = URL(webAppUrl)
+                val connection = (url.openConnection() as HttpURLConnection).apply {
+                    requestMethod = "POST"
+                    setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                    doOutput = true
+                }
+
+                connection.outputStream.use { outputStream ->
+                    outputStream.write(jsonArray.toString().toByteArray(Charsets.UTF_8))
+                }
+
+                val responseCode = connection.responseCode
+                responseCode == HttpURLConnection.HTTP_OK
+            } catch (e: Exception) {
+                e.printStackTrace()
+                false
+            }
+        }
     }
 }

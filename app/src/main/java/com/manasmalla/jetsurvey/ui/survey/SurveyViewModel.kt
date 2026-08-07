@@ -192,4 +192,16 @@ class SurveyViewModel(private val dbHelper: SurveyDbHelper) : ViewModel() {
             }
         }
     }
+
+    fun syncAndFinishSurvey(webAppUrl: String, onFinished: () -> Unit) {
+        viewModelScope.launch {
+            // Sync data to Google Sheets
+            dbHelper.syncToGoogleSheets(webAppUrl)
+
+            // Once done (or failed), trigger the completion navigation
+            withContext(Dispatchers.Main) {
+                onFinished()
+            }
+        }
+    }
 }
