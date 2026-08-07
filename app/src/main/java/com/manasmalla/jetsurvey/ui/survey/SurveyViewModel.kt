@@ -12,6 +12,7 @@ import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.manasmalla.jetsurvey.data.Options
+import com.manasmalla.jetsurvey.data.SurveyQuestion
 import com.manasmalla.jetsurvey.data.SurveySummaryItem
 import com.manasmalla.jetsurvey.data.questions
 import com.manasmalla.jetsurvey.ui.survey.util.SurveyDbHelper
@@ -25,10 +26,12 @@ import java.util.Locale
 
 class SurveyViewModel(private val dbHelper: SurveyDbHelper) : ViewModel() {
 
-    // This is question number
+    // This represents the current page number (1, 2, 3...)
     var progress by mutableStateOf(1)
         private set
-    val question get() = questions[progress - 1]
+
+    // Kept for backward compatibility if single-question references are needed
+    val question get() = questions.getOrNull((progress - 1) * 4) ?: questions.first()
 
     var isNextEnabled by mutableStateOf(false)
         private set
@@ -45,8 +48,16 @@ class SurveyViewModel(private val dbHelper: SurveyDbHelper) : ViewModel() {
             Locale.getDefault()
         ).format(Date(date ?: Calendar.getInstance().time.time))
 
-    // Map holding selected options FOR EACH question ID
+    // Map holding selected options FOR EACH unique question ID
     val multipleChoiceAnswers = mutableStateMapOf<String, List<String>>()
+
+    // Exposes a chunk of up to 4 questions for the current page
+    val questionsList: List<SurveyQuestion>
+        get() {
+            val startIndex = (progress - 1) * 4
+            if (startIndex >= questions.size) return emptyList()
+            return questions.subList(startIndex, minOf(startIndex + 4, questions.size))
+        }
 
     fun showDatePicker(fragmentManager: FragmentManager) {
         val picker = MaterialDatePicker.Builder.datePicker()
@@ -62,27 +73,34 @@ class SurveyViewModel(private val dbHelper: SurveyDbHelper) : ViewModel() {
         }
     }
 
+    // FIXED: Checks all questions currently visible on this page
     private fun checkIfNextEnabled(): Boolean {
-        val currentQuestionId = "question_$progress"
-        return when (question.options) {
-            Options.DateChoice -> date != null
-            Options.ImageChoice -> selfie != null
-            is Options.MultipleChoice -> !multipleChoiceAnswers[currentQuestionId].isNullOrEmpty()
-            is Options.SingleChoice -> composeCharacter.isNotEmpty()
-            is Options.SliderChoice -> selfieFeeling != null
-            is Options.CheckboxChoice -> !multipleChoiceAnswers[currentQuestionId].isNullOrEmpty()
+        val currentQuestions = questionsList
+        if (currentQuestions.isEmpty()) return false
+
+        // Ensure every question on the current page has a valid answer
+        return currentQuestions.indices.all { index ->
+            val currentQuestionId = "question_${progress}_$index"
+            val q = currentQuestions[index]
+
+            when (q.options) {
+                Options.DateChoice -> date != null
+                Options.ImageChoice -> selfie != null
+                is Options.MultipleChoice -> !multipleChoiceAnswers[currentQuestionId].isNullOrEmpty()
+                is Options.SingleChoice -> composeCharacter.isNotEmpty()
+                is Options.SliderChoice -> selfieFeeling != null
+                is Options.CheckboxChoice -> !multipleChoiceAnswers[currentQuestionId].isNullOrEmpty()
+            }
         }
     }
 
+    // FIXED: Moves forward by page instead of single question index
     fun nextQuestion() {
-        if (progress < questions.size) {
+        val maxPages = (questions.size + 3) / 4 // Total pages calculation
+        if (progress < maxPages) {
             progress += 1
-            val currentQuestionId = "question_$progress"
 
-            // Reset options for the new question page so checkboxes render unchecked
-            multipleChoiceAnswers[currentQuestionId] = emptyList()
-
-            // Reset other input fields
+            // Reset other input fields for the new page
             composeCharacter = ""
             selfieFeeling = null
             selfie = null
@@ -95,7 +113,10 @@ class SurveyViewModel(private val dbHelper: SurveyDbHelper) : ViewModel() {
     fun previousQuestion() {
         if (progress > 1) {
             progress--
-            loadSavedOptionsForQuestion("question_$progress")
+            // Load saved answers for the previous page slots if stored
+            questionsList.indices.forEach { index ->
+                loadSavedOptionsForQuestion("question_${progress}_$index")
+            }
         }
     }
 
@@ -118,30 +139,28 @@ class SurveyViewModel(private val dbHelper: SurveyDbHelper) : ViewModel() {
         return multipleChoiceAnswers[questionId] ?: emptyList()
     }
 
-    // 1-parameter overload for simple UI calls
     fun updateMultipleOptionsAnswer(option: String) {
-        updateMultipleOptionsAnswer(optionString = option, questionId = "question_$progress")
+        updateMultipleOptionsAnswer(optionString = option, questionId = "question_${progress}_0")
     }
 
-    // Main 2-parameter function to handle single vs multiple choices based on question type
     fun updateMultipleOptionsAnswer(optionString: String, questionId: String) {
-        val questionIndex = questionId.removePrefix("question_").toIntOrNull()?.minus(1) ?: (progress - 1)
-        val targetQuestion = questions.getOrNull(questionIndex) ?: question
-
         val currentList = multipleChoiceAnswers[questionId].orEmpty().toMutableList()
+
+        // Extract question index to determine option behavior rules if needed
+        val questionIndex = questionId.substringAfterLast("_").toIntOrNull() ?: 0
+        val targetQuestion = questionsList.getOrNull(questionIndex) ?: question
 
         when (targetQuestion.options) {
             is Options.CheckboxChoice -> {
-                // Single-selection behavior: Only one checkbox can be checked at a time
+                // Single-selection behavior per specific checkbox group
                 if (currentList.contains(optionString)) {
-                    currentList.clear() // Allows deselecting if clicked again
+                    currentList.clear()
                 } else {
                     currentList.clear()
                     currentList.add(optionString)
                 }
             }
             is Options.MultipleChoice -> {
-                // Multi-selection behavior: Multiple checkboxes can be checked
                 if (currentList.contains(optionString)) {
                     currentList.remove(optionString)
                 } else {
@@ -149,7 +168,6 @@ class SurveyViewModel(private val dbHelper: SurveyDbHelper) : ViewModel() {
                 }
             }
             else -> {
-                // Fallback toggle behavior
                 if (currentList.contains(optionString)) {
                     currentList.remove(optionString)
                 } else {
@@ -158,13 +176,11 @@ class SurveyViewModel(private val dbHelper: SurveyDbHelper) : ViewModel() {
             }
         }
 
-        // Reassigning the list forces Compose state to update
         multipleChoiceAnswers[questionId] = currentList
 
-        // Immediately update button visibility state
+        // Re-evaluate if all questions on the page are now completed
         isNextEnabled = checkIfNextEnabled()
 
-        // Save to SQLite on background thread
         viewModelScope.launch(Dispatchers.IO) {
             dbHelper.saveResponse(questionId, currentList)
         }
@@ -193,12 +209,17 @@ class SurveyViewModel(private val dbHelper: SurveyDbHelper) : ViewModel() {
         }
     }
 
+    // Inside SurveyViewModel.kt
     fun syncAndFinishSurvey(webAppUrl: String, onFinished: () -> Unit) {
-        viewModelScope.launch {
-            // Sync data to Google Sheets
-            dbHelper.syncToGoogleSheets(webAppUrl)
+        viewModelScope.launch(Dispatchers.IO) {
+            // syncToGoogleSheets returns a Boolean (true if HTTP_OK)
+            val isSyncedSuccessfully = dbHelper.syncToGoogleSheets(webAppUrl)
 
-            // Once done (or failed), trigger the completion navigation
+            if (isSyncedSuccessfully) {
+                // Truncate the SQLite table because data was safely sent
+                dbHelper.clearTable()
+            }
+
             withContext(Dispatchers.Main) {
                 onFinished()
             }

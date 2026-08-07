@@ -139,4 +139,10 @@ class SurveyDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             }
         }
     }
+
+    // Inside SurveyDbHelper.kt
+    fun clearTable() {
+        val db = writableDatabase
+        db.execSQL("DELETE FROM survey_responses")
+    }
 }

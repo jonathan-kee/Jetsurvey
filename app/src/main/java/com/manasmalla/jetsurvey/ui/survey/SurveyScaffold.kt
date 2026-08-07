@@ -8,7 +8,9 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -52,8 +54,8 @@ private tailrec fun Context.findActivity(): AppCompatActivity =
 @Composable
 fun SurveyScaffold(
     modifier: Modifier = Modifier,
-    onNavigateUp: ()->Unit = {},
-    onNavigateToResults: ()->Unit = {}
+    onNavigateUp: () -> Unit = {},
+    onNavigateToResults: () -> Unit = {}
 ) {
     // 1. Get application context
     val context = LocalContext.current.applicationContext
@@ -69,9 +71,7 @@ fun SurveyScaffold(
     )
 
     val progress: Int = surveyViewModel.progress
-    val question: SurveyQuestion = surveyViewModel.question
-    // data package Questions.kt data will be here
-    print(question)
+    val questions: List<SurveyQuestion> = surveyViewModel.questionsList
 
     // ------------ Decoration ------------
     Scaffold(topBar = {
@@ -83,7 +83,8 @@ fun SurveyScaffold(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    "$progress of 5",
+                    // UPDATED: Changed total to 2
+                    "$progress of 2",
                     modifier = Modifier
                         .weight(1f)
                         .padding(start = 48.dp)
@@ -95,7 +96,8 @@ fun SurveyScaffold(
                 }
             }
             LinearProgressIndicator(
-                progress = 0.2f.times(progress),
+                // UPDATED: Changed from 0.2f to 0.5f so step 2 reaches 100% (1.0f)
+                progress = 0.5f.times(progress),
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -105,115 +107,112 @@ fun SurveyScaffold(
             isNextEnabled = surveyViewModel.isNextEnabled,
             onPreviousPressed = surveyViewModel::previousQuestion,
             onNextPressed =
-                if(surveyViewModel.progress!= 5)
+                // UPDATED: Changed condition check from 5 to 2
+                if (surveyViewModel.progress != 2)
                     surveyViewModel::nextQuestion
                 else onNavigateToResults
-
         )
-    }, modifier = modifier.statusBarsPadding()) {
+    }, modifier = modifier.statusBarsPadding()) { paddingValues ->
         // ------------ Decoration ------------
 
-        AnimatedContent(targetState = question) { surveyQuestion ->
+        AnimatedContent(targetState = questions, label = "QuestionsPage") { surveyQuestions ->
             Column(
                 modifier = Modifier
-                    .padding(it)
+                    .padding(paddingValues)
                     .verticalScroll(rememberScrollState())
             ) {
 
-                Text(
-                    surveyQuestion.question,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(40.dp)
-                        .clip(MaterialTheme.shapes.small)
-                        .background(color = MaterialTheme.colorScheme.inverseOnSurface)
-                        .padding(40.dp),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = slightlyDeemphasizedAlpha),
-                )
-                if (surveyQuestion.description != "")
-                    Text(
-                        text = surveyQuestion.description,
-                        modifier = Modifier.padding(start = 40.dp, bottom = 40.dp),
-                        style = MaterialTheme.typography.bodySmall,
+                surveyQuestions.forEachIndexed { index, surveyQuestion ->
 
-                        color = MaterialTheme.colorScheme.onSurface
-                            .copy(alpha = stronglyDeemphasizedAlpha),
+                    Text(
+                        text = surveyQuestion.question,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 40.dp, vertical = 20.dp)
+                            .clip(MaterialTheme.shapes.small)
+                            .background(color = MaterialTheme.colorScheme.inverseOnSurface)
+                            .padding(20.dp),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = slightlyDeemphasizedAlpha),
                     )
 
-                // Here is checking the Questions.kt data options
-                // This is like a sealed class check
-                when (val options:Options = surveyQuestion.options) {
-                    is Options.DateChoice -> {
-
-                        val fragmentManager =
-                            LocalContext.current.findActivity().supportFragmentManager
-                        DateQuestion(
-                            date = surveyViewModel.formattedDate, showDatePicker = {
-                                surveyViewModel.showDatePicker(fragmentManager = fragmentManager)
-                            }
+                    if (surveyQuestion.description != "") {
+                        Text(
+                            text = surveyQuestion.description,
+                            modifier = Modifier.padding(start = 40.dp, bottom = 20.dp),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface
+                                .copy(alpha = stronglyDeemphasizedAlpha),
                         )
                     }
 
-                    is Options.ImageChoice -> {
-                        FileQuestion(
-                            modifier = Modifier.padding(32.dp),
-                            imageUri = surveyViewModel.selfie,
-                            onImageSelected = surveyViewModel::onImageSelected)
+                    val currentQuestionId = "question_${progress}_$index"
+
+                    when (val options: Options = surveyQuestion.options) {
+                        is Options.DateChoice -> {
+                            val fragmentManager =
+                                LocalContext.current.findActivity().supportFragmentManager
+                            DateQuestion(
+                                date = surveyViewModel.formattedDate, showDatePicker = {
+                                    surveyViewModel.showDatePicker(fragmentManager = fragmentManager)
+                                }
+                            )
+                        }
+
+                        is Options.ImageChoice -> {
+                            FileQuestion(
+                                modifier = Modifier.padding(32.dp),
+                                imageUri = surveyViewModel.selfie,
+                                onImageSelected = surveyViewModel::onImageSelected
+                            )
+                        }
+
+                        is Options.MultipleChoice -> {
+                            MultipleOptionsSection(
+                                options = options,
+                                selectedOptions = surveyViewModel.getSelectedOptionsForQuestion(currentQuestionId).toMutableList(),
+                                onOptionSelected = { option ->
+                                    surveyViewModel.updateMultipleOptionsAnswer(
+                                        option,
+                                        currentQuestionId
+                                    )
+                                }
+                            )
+                        }
+
+                        is Options.SingleChoice -> {
+                            SingleOptionsSection(
+                                selected = surveyViewModel.composeCharacter,
+                                options = options,
+                                onOptionSelected = surveyViewModel::updateComposeCharacter
+                            )
+                        }
+
+                        is Options.SliderChoice -> {
+                            SliderChoice(
+                                options = options,
+                                modifier = Modifier.padding(32.dp),
+                                value = surveyViewModel.selfieFeeling ?: 0.5f,
+                                onValueChange = surveyViewModel::onSelfieFeelingChange
+                            )
+                        }
+
+                        is Options.CheckboxChoice -> {
+                            CheckboxChoice(
+                                selectedOptions = surveyViewModel.getSelectedOptionsForQuestion(currentQuestionId),
+                                onOptionToggle = { option ->
+                                    surveyViewModel.updateMultipleOptionsAnswer(
+                                        option,
+                                        questionId = currentQuestionId
+                                    )
+                                },
+                                options = options
+                            )
+                        }
                     }
 
-                    is Options.MultipleChoice -> {
-                        val currentQuestionId = "question_$progress"
-                        MultipleOptionsSection(
-                            options = options,
-                            // Convert the read-only list to a mutable list to satisfy the function parameter type
-                            selectedOptions = surveyViewModel.getSelectedOptionsForQuestion(currentQuestionId).toMutableList(),
-                            onOptionSelected = { option ->
-                                surveyViewModel.updateMultipleOptionsAnswer(
-                                    option,
-                                    currentQuestionId
-                                )
-                            }
-                        )
-                    }
-
-
-                    is Options.SingleChoice -> {
-                        SingleOptionsSection(
-                            selected = surveyViewModel.composeCharacter,
-                            options = options,
-                            onOptionSelected = surveyViewModel::updateComposeCharacter)
-                    }
-
-                    is Options.SliderChoice -> {
-                        SliderChoice(
-                            options = options,
-                            modifier = Modifier.padding(32.dp),
-                            value = surveyViewModel.selfieFeeling ?: 0.5f,
-                            onValueChange = surveyViewModel::onSelfieFeelingChange)
-
-                    }
-
-//                    is Options.CheckboxChoice -> {
-//                        CheckboxChoice(
-//                            options = options,
-//                            modifier = Modifier.padding(32.dp),
-//                            selectedOptions = surveyViewModel.freeTimeOptions,
-//                            onOptionToggle = surveyViewModel::updateMultipleOptionsAnswer
-//                        )
-//                    }
-
-                    is Options.CheckboxChoice -> {
-                        CheckboxChoice(
-                            selectedOptions = surveyViewModel.getSelectedOptionsForQuestion("question_$progress"),
-                            onOptionToggle = { option ->
-                                surveyViewModel.updateMultipleOptionsAnswer(option, questionId = "question_$progress")
-                            },
-                            options = options
-                        )
-                    }
+                    Spacer(modifier = Modifier.height(32.dp))
                 }
-
             }
         }
     }
