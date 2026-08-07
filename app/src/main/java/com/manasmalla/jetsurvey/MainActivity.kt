@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import com.example.compose.AppTheme
 import com.manasmalla.jetsurvey.ui.JetsurveyApp
-import com.manasmalla.jetsurvey.ui.theme.JetsurveyTheme
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
