@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -76,7 +77,8 @@ fun SurveyResultScreen(
                             Text(text = "Summary")
                         }
 
-                        OutlinedButton(
+                        // Standard Button automatically uses MaterialTheme.colorScheme.primary (your app's green theme)
+                        Button(
                             contentPadding = buttonPadding,
                             onClick = {
                                 isLoading = true
