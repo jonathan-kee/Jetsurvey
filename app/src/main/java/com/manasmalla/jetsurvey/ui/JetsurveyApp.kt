@@ -19,6 +19,8 @@ object Destinations {
     const val WELCOME_ROUTE = "welcome"
     const val SURVEY_ROUTE = "survey"
     const val SURVEY_RESULT_ROUTE = "result"
+
+    const val SUMMARY_RESULT_ROUTE = "sumary"
 }
 
 @Composable
@@ -49,8 +51,15 @@ fun JetsurveyApp(navController: NavHostController = rememberNavController()) {
             )
         }
 
+        composable(Destinations.SURVEY_RESULT_ROUTE){
+            SurveyResultScreen (
+                onDonePressed = { navController.popBackStack(Destinations.WELCOME_ROUTE, false)},
+                onSummaryPressed = { navController.navigate(Destinations.SUMMARY_RESULT_ROUTE)}
+            )
+        }
+
         // "result"
-        composable(Destinations.SURVEY_RESULT_ROUTE) {
+        composable(Destinations.SUMMARY_RESULT_ROUTE) {
             // 1. Get Application Context
             val context = LocalContext.current.applicationContext
 
